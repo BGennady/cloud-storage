@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS storage.files(
+id BIGSERIAL PRIMARY KEY,
+filename VARCHAR (25) NOT NULL,
+path VARCHAR (255)NOT NULL,
+size INT,
+upload_time TIMESTAMP,
+user_id BIGINT
+)
