@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud_storage.model.Files;
 import ru.netology.cloud_storage.model.Token;
-import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.FilesRepository;
 import ru.netology.cloud_storage.repository.TokenRepository;
 
@@ -24,7 +23,7 @@ public class FileService {
 
     //метод для сохранения файла
     public void fileUpload(String filename, MultipartFile multipartFile, String token) {
-        // ищем token в БД
+        // проверка на наличие token в БД
         Optional<Token> tokenOpt = tokenRepository.findByToken(token);
         if (tokenOpt.isEmpty()) {
             throw new RuntimeException("Токен не найден");
@@ -51,7 +50,9 @@ public class FileService {
 
         filesRepository.save(file);
     }
-    public List<String> listOfFiles (String token){
+
+    public List<String> listOfFiles(String token) {
+        // проверка на наличие token в БД
         Optional<Token> tokenOpt = tokenRepository.findByToken(token);
         if (tokenOpt.isEmpty()) {
             throw new RuntimeException("Токен не найден");
@@ -67,5 +68,34 @@ public class FileService {
                 .toList(); //положить в List
 
         return filesName;
+    }
+
+    public void fileDelete(String fileName, String token) {
+        // проверка на наличие token в БД
+        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            throw new RuntimeException("Токен не найден");
+        }
+        Long userId = tokenOpt.get().getUser().getId();
+
+        //нахожу в БД нужный файл
+        Optional<Files> fileOpt = filesRepository.findByUser_IdAndFilename(userId, fileName);
+        if (fileOpt.isPresent()) {
+
+            //удаляю из БД
+            Files file = fileOpt.get();
+            filesRepository.delete(file);
+
+            //удаляю с диска
+            File diskFile = new File(file.getPath());
+            if (diskFile.exists()) {
+                boolean deleted = diskFile.delete();
+                if (!deleted) {
+                    throw new RuntimeException("Файл не был удален");
+                }
+            } else {
+                throw new RuntimeException("Файл не найде");
+            }
+        }
     }
 }

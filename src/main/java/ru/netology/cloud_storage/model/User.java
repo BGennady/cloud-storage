@@ -22,7 +22,7 @@ public class User {
 
     private Long id; //порядковый номер в бд
 
-    @Column (nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String login; //логин подльзователя
 
     @Column(nullable = false)

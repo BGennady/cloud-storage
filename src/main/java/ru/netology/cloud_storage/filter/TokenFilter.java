@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.netology.cloud_storage.controller.TokenController;
 import ru.netology.cloud_storage.repository.TokenRepository;
 
 import java.io.IOException;
@@ -34,17 +33,24 @@ public class TokenFilter implements Filter {
             return;
         }
 
-        //получение токена из заголовка Authorization
-        String token = httpRequest.getHeader("Authorization");
+        String authHeader = httpRequest.getHeader("Authorization");
+        //проверяю заголовок, что не null и не начинается на Bearer с пробелом
+        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //401
+            httpResponse.getWriter().write("Unauthorized: отсутсвует заголовок Bearer");
+            return;
+        }
+
+        //обрезаю Bearer
+        String token = authHeader.substring(7);
 
         //если токена нет/нет в базе выкидываем ошибку 401 Unauthorization
         if (token == null || token.isEmpty() || tokenRepository.findByToken(token).isEmpty()) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //401
-            httpResponse.getWriter().write("Unauthorization: токен отсвуствует или недействителен");
+            httpResponse.getWriter().write("Unauthorized: токен отсвуствует или недействителен");
             return;
         }
         //если все ОК запрос уходит обработку (по цепочке фильтров)
         chain.doFilter(request, response);
     }
 }
-
