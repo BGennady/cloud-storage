@@ -1,6 +1,8 @@
 package ru.netology.cloud_storage.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.netology.cloud_storage.model.Token;
 import ru.netology.cloud_storage.model.User;
@@ -27,7 +29,11 @@ public class UserService {
             throw new RuntimeException("Пользовавтель не найден");
         }
         User user = userOpt.get();
-        if (!user.getPassword().equals(pass)) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        // сверка захешированого пароля с тем, что хъранится в базе
+        if (!encoder.matches(pass, user.getPassword())) {
             throw new RuntimeException("Пароль не верный");
         }
         //генерирация нового токена
