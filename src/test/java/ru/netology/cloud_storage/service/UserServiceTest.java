@@ -3,6 +3,7 @@ package ru.netology.cloud_storage.service;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.netology.cloud_storage.model.Token;
 import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.TokenRepository;
@@ -25,15 +26,24 @@ public class UserServiceTest {
     private User testUser;
     private Token testToken;
 
+    private BCryptPasswordEncoder encoder;
+
 
     @BeforeEach
     void init() {
         userRepository = mock(UserRepository.class);
         tokenRepository = mock((TokenRepository.class));
         //объект userService
-        userService = new UserService(userRepository,tokenRepository);
+        userService = new UserService(userRepository, tokenRepository);
 
-        testUser = new User(userId, login, pass);
+        encoder = new BCryptPasswordEncoder();
+
+
+
+        //хеширование полученого пароля
+        String encoderPass = encoder.encode(pass);
+
+        testUser = new User(userId, login, encoderPass);
         testToken = new Token();
         testToken.setToken(token);
         testToken.setUser(testUser);
