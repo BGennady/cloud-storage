@@ -13,6 +13,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // отключает CSRF — иначе Postman может блокироваться
+                .httpBasic(httpBasic ->httpBasic.disable()) //отключение базовой аутентефикации
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/cloud/entrance").permitAll() // разрешаем свободный доступ к /api/public/**
                         .anyRequest().authenticated() // все остальные — только для авторизованных
