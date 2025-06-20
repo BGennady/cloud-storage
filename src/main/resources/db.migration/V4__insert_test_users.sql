@@ -1,6 +1,5 @@
-INSERT INTO "users" (login, password)
+INSERT INTO storage.users (login, password)
 VALUES
-
   ('admin',  '$2a$10$eB9ZJxIjKXK/1n.3dQpD0e6vCIfhNl0tZsRG65EdA/6P/PM.RRJVi'), -- pass123
   ('test1',  '$2a$10$QrA3jEwhdn.QR8F2CWJgQunV06TZj4jvwIf4RQ7aK1O0sXWqfVxPS'), -- test123
   ('test2',  '$2a$10$ccUJeAKeJAG3Qo4Xf9s0NeYfXwZZ2ImkzH1k4pUK6fFhhBoCjeZeq'), -- abc321
