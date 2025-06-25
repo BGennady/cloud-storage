@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS storage.token(
-id BIGSERIAL PRIMARY KEY,
-token VARCHAR(255) NOT NULL,
-user_id BIGINT,
-created_at TIMESTAMP
-);
