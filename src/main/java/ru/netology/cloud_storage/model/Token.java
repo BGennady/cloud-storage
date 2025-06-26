@@ -20,8 +20,7 @@ public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private Long id; //порядковый номер в БД>
-
+    private Long id; //порядковый номер в БД
     private String token; //токен
 
     @ManyToOne

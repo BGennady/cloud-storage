@@ -32,7 +32,7 @@ public class UserService {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        // сверка захешированого пароля с тем, что хъранится в базе
+        // сверка захешированого пароля с тем, что хранится в базе
         if (!encoder.matches(pass, user.getPassword())) {
             throw new RuntimeException("Пароль не верный");
         }

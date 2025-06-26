@@ -2,10 +2,7 @@ package ru.netology.cloud_storage.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.netology.cloud_storage.model.LoginRequest;
 import ru.netology.cloud_storage.model.TokenRequest;
 import ru.netology.cloud_storage.service.UserService;
@@ -28,8 +25,12 @@ public class UserController {
 
     //эдпоинт для подачи заявки на выход
     @PostMapping("/exit")
-    public ResponseEntity<String> applyForLogout(@RequestBody TokenRequest token) {
-        boolean result = userService.logout(token.getToken());
+    // прилетает заголовок типа: Authorization: Bearer ****
+    public ResponseEntity<String> applyForLogout(@RequestHeader("Authorization") String authToken) {
+        //отсекается заголовок Bearer (меняется на ничего)
+        String token = authToken.replace("Bearer ", "");
+
+        boolean result = userService.logout(token);
 
         if (result) {
             return ResponseEntity.ok("Вы вышли");
