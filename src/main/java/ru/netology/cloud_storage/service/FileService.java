@@ -1,10 +1,11 @@
 package ru.netology.cloud_storage.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud_storage.model.Files;
-import ru.netology.cloud_storage.model.Token;
+import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.FilesRepository;
 import ru.netology.cloud_storage.repository.TokenRepository;
 
@@ -20,18 +21,16 @@ public class FileService {
 
     private final TokenRepository tokenRepository;
     private final FilesRepository filesRepository;
+    private final UserService userService;
 
     //метод для сохранения файла
-    public void fileUpload(String filename, MultipartFile multipartFile, String token) {
-        // проверка на наличие token в БД
-        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
-        if (tokenOpt.isEmpty()) {
-            throw new RuntimeException("Токен не найден");
-        }
-        Token userToken = tokenOpt.get();
+    public void fileUpload(String filename, MultipartFile multipartFile) {
+
+        // получение текущего авторизованого пользователя из Spring Seqcurity
+        User user = userService.getCurrentUser();
 
         // путь к сохранению файла
-        String saveFile = "uploads/" + filename;
+        String saveFile = "D:/New/" + filename;
 
         try {
             //сохранение файла на диск
@@ -41,23 +40,23 @@ public class FileService {
         }
 
         //создать запись в БД
-        Files file = new Files(); //новая сущность Files, и в нее передаю
-        file.setFilename(filename); //имя файла
-        file.setPath(saveFile); //куда его сохранить
-        file.setSize((int) multipartFile.getSize()); //его размер
-        file.setUploadTime(LocalDateTime.now()); //дата/время
-        file.setUser(userToken.getUser()); //имя пользователя
+        Files file = new Files() //новая сущность Files, и в нее передаю
+                .setFilename(filename) //имя файла
+                .setPath(saveFile) //куда его сохранить
+                .setSize((int) multipartFile.getSize()) //его размер
+                .setUploadTime(LocalDateTime.now()) //дата/время
+                .setUser(user); //имя пользователя
 
         filesRepository.save(file);
     }
 
-    public List<String> listOfFiles(String token) {
-        // проверка на наличие token в БД
-        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
-        if (tokenOpt.isEmpty()) {
-            throw new RuntimeException("Токен не найден");
-        }
-        Long userId = tokenOpt.get().getUser().getId();
+    // метод для получения списка файлов
+    public List<String> listOfFiles() {
+
+        // получение текущего авторизованого пользователя
+        User user = userService.getCurrentUser();
+
+        Long userId = user.getId();
 
         //получаю список записей о файлах пользователя в виде потока
         List<Files> allFiles = filesRepository.findAllByUser_Id(userId);
@@ -70,13 +69,13 @@ public class FileService {
         return filesName;
     }
 
-    public void fileDelete(String fileName, String token) {
-        // проверка на наличие token в БД
-        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
-        if (tokenOpt.isEmpty()) {
-            throw new RuntimeException("Токен не найден");
-        }
-        Long userId = tokenOpt.get().getUser().getId();
+    // метод удаления файлов
+    public void fileDelete(String fileName) {
+
+        // получение текущего авторизованого пользователя
+        User user = userService.getCurrentUser();
+
+        Long userId = user.getId();
 
         //нахожу в БД нужный файл
         Optional<Files> fileOpt = filesRepository.findByUser_IdAndFilename(userId, fileName);

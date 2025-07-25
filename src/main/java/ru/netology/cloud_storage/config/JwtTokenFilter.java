@@ -28,6 +28,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        //проверка, что на вход
+        String path = request.getRequestURI();
+        if (path.equals("/api/cloud/entrance")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         //получает заголовок из запроса
         String header = request.getHeader("Authorization");
 
@@ -45,14 +52,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 //объект Authentication с пользователем и пустыстыми правами
                 Authentication auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
 
-                //сохраняет в SecurityContext для дальнейших проверок
+                //оборачивает user и учетные данные (Authentication) в SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(auth);
-
-                //передает дальше по цепочке фильтров
-                filterChain.doFilter(request, response);
             }
         }
-
-
+        //при любом варианте, передает дальше по цепочке фильтров
+        filterChain.doFilter(request, response);
     }
 }

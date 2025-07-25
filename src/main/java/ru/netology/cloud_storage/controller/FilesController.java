@@ -17,25 +17,21 @@ public class FilesController {
     //эдпоинт для загрузки файлов
     @PostMapping("/file")
     public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file,
-                                             @RequestParam("filename") String filename,
-                                             @RequestHeader("Authorization") String token) {
-        fileService.fileUpload(filename,file,token);
+                                             @RequestParam("filename") String filename) {
+        fileService.fileUpload(filename,file);
         return ResponseEntity.ok("Файл загружен" + filename);
     }
     //эдпоинт для получения списка файлов
     @GetMapping("/list")
-    public ResponseEntity<List<String>> listOfFiles(@RequestHeader("Authorization") String token){
-       List<String> list = fileService.listOfFiles(token);
+    public ResponseEntity<List<String>> listOfFiles(){
+       List<String> list = fileService.listOfFiles();
        return ResponseEntity.ok(list);
     }
 
     //эдпоинт для удаления файла
     @DeleteMapping("/delete")
-    public ResponseEntity<String> fileDelite (@RequestParam("filename") String filename,
-                                              @RequestHeader ("Authorization") String token
-
-    ){
-        fileService.fileDelete(filename,token);
+    public ResponseEntity<String> fileDelite (@RequestParam("filename") String filename){
+        fileService.fileDelete(filename);
         return ResponseEntity.ok("Файл удален" + filename);
     }
 

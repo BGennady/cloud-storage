@@ -1,6 +1,7 @@
 package ru.netology.cloud_storage.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,12 +53,25 @@ public class UserService {
     }
 
     //метод для выхода
-    public boolean logout(String token) {
-        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
-        if (tokenOpt.isPresent()){
+    public boolean logout() {
+
+        User user = getCurrentUser();
+
+        // получаю активного пользоваптеля из базы
+        Optional<Token> tokenOpt = tokenRepository.findByUser(user);
+        if (tokenOpt.isPresent()) {
             tokenRepository.delete(tokenOpt.get());
-        return true;
-        };
+            return true;
+        }
+        ;
         return false;
+    }
+
+    //метод для получения текущего авторизованого пользователя из Spring Seqcurity
+    public User getCurrentUser() {
+        return ((User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
     }
 }
