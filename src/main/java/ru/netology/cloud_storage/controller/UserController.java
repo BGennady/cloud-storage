@@ -5,11 +5,12 @@ import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.netology.cloud_storage.DTO.LoginResponse;
 import ru.netology.cloud_storage.model.LoginRequest;
 import ru.netology.cloud_storage.service.UserService;
 
 @RestController //анотация для обработки HTTP запросов
-@RequestMapping("/api/cloud") //базовый пусть для всех эдпоинтов
+@RequestMapping("/cloud") //базовый пусть для всех эдпоинтов
 @AllArgsConstructor
 public class UserController {
 
@@ -17,15 +18,15 @@ public class UserController {
     private final UserService userService;
 
     //эдпоинт для подачи заявки на вход
-    @PostMapping("/entrance")
-    public ResponseEntity<String> applyForLogin(@RequestBody LoginRequest login) {
-        String token = userService.login(login.getEmail(), login.getPassword());
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> applyForLogin(@RequestBody LoginRequest login) {
+        LoginResponse response = userService.login(login.getLogin(), login.getPassword());
         //возврат тела с кодом 200 (ок)
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(response);
     }
 
     //эдпоинт для подачи заявки на выход
-    @PostMapping("/exit")
+    @PostMapping("/logout")
     // прилетает заголовок типа: Authorization: Bearer ****
     public ResponseEntity<String> applyForLogout(Authentication auth){
         //получаю имя пользователя

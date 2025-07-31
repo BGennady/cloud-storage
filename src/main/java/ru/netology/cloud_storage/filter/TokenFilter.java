@@ -28,7 +28,7 @@ public class TokenFilter implements Filter {
 
         //запросы на вход и выход пропускаем без проверки
         String path = httpRequest.getRequestURI();
-        if(path.equals("/api/cloud/entrance") || path.equals("/api/cloud/exit")){
+        if(path.equals("/cloud/login") || path.equals("/cloud/logout")){
             chain.doFilter(request, response);
             return;
         }

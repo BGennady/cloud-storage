@@ -30,7 +30,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         //проверка, что на вход
         String path = request.getRequestURI();
-        if (path.equals("/api/cloud/entrance")) {
+        if (path.equals("cloud/login")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -38,25 +38,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         //получает заголовок из запроса
         String header = request.getHeader("Authorization");
 
-        // проверка, что не пустой и начинается и начинается с "Bearer"
         if (header != null && header.startsWith("Bearer ")) {
-            //отсекает заголовок Bearer (меняется на ничего)
             String token = header.replace("Bearer ", "");
-
             Optional<Token> optionalToken = tokenRepository.findByToken(token);
-            //проверка, что токен не пуст
+
             if (optionalToken.isPresent()) {
-                //берет user по этому токену
                 User user = optionalToken.get().getUser();
-
-                //объект Authentication с пользователем и пустыстыми правами
                 Authentication auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-
-                //оборачивает user и учетные данные (Authentication) в SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
-        //при любом варианте, передает дальше по цепочке фильтров
+
         filterChain.doFilter(request, response);
     }
 }

@@ -2,9 +2,9 @@ package ru.netology.cloud_storage.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.netology.cloud_storage.DTO.LoginResponse;
 import ru.netology.cloud_storage.model.Token;
 import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.TokenRepository;
@@ -23,7 +23,7 @@ public class UserService {
     private TokenRepository tokenRepository;
 
     // метод проверки login и password
-    public String login(String login, String pass) {
+    public LoginResponse login(String login, String pass) {
         // ищем пользователя по логину
         Optional<User> userOpt = userRepository.findByLogin(login);
         if (userOpt.isEmpty()) {
@@ -37,6 +37,10 @@ public class UserService {
         if (!encoder.matches(pass, user.getPassword())) {
             throw new RuntimeException("Пароль не верный");
         }
+
+        // удаляем все старые токены пользователя
+        tokenRepository.deleteByUser(user);
+
         //генерирация нового токена
         String generatedToken = UUID.randomUUID().toString();
 
@@ -49,22 +53,17 @@ public class UserService {
         //сохранение данных
         tokenRepository.save(token);
 
-        return generatedToken;
+        return new LoginResponse(generatedToken);
     }
 
     //метод для выхода
     public boolean logout() {
 
+        // получает активного пользовного user из базы
         User user = getCurrentUser();
-
-        // получаю активного пользоваптеля из базы
-        Optional<Token> tokenOpt = tokenRepository.findByUser(user);
-        if (tokenOpt.isPresent()) {
-            tokenRepository.delete(tokenOpt.get());
-            return true;
-        }
-        ;
-        return false;
+        // удаляет все его токены
+        tokenRepository.deleteByUser(user);
+        return true;
     }
 
     //метод для получения текущего авторизованого пользователя из Spring Seqcurity

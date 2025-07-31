@@ -9,7 +9,7 @@ import ru.netology.cloud_storage.service.FileService;
 import java.util.List;
 
 @RestController //анотация для обработки HTTP запросов
-@RequestMapping("api/cloud") //базовый пусть для всех эдпоинтов
+@RequestMapping("/cloud") //базовый пусть для всех эдпоинтов
 @AllArgsConstructor
 public class FilesController {
     private final FileService fileService;
@@ -24,8 +24,8 @@ public class FilesController {
     //эдпоинт для получения списка файлов
     @GetMapping("/list")
     public ResponseEntity<List<String>> listOfFiles(){
-       List<String> list = fileService.listOfFiles();
-       return ResponseEntity.ok(list);
+        List<String> list = fileService.listOfFiles();
+        return ResponseEntity.ok(list);
     }
 
     //эдпоинт для удаления файла
@@ -34,5 +34,4 @@ public class FilesController {
         fileService.fileDelete(filename);
         return ResponseEntity.ok("Файл удален" + filename);
     }
-
 }

@@ -11,7 +11,7 @@ import ru.netology.cloud_storage.repository.TokenRepository;
 @AllArgsConstructor
 @Configuration
 public class SecurityConfig {
-   private final TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Bean
     // типовой конфигурационный метод для настройки фильтроа безопасности у входящих HTTP-запросов
@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // отключает CSRF — иначе Postman может блокироваться
                 .httpBasic(httpBasic -> httpBasic.disable()) //отключение базовой аутентефикации
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/cloud/entrance").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/cloud/login").permitAll()
                         // разрешаем свободный доступ к /api/public/**
                         .anyRequest().authenticated() // все остальные — только для авторизованных
                 )
