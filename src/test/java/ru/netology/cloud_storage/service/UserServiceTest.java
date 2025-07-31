@@ -3,7 +3,10 @@ package ru.netology.cloud_storage.service;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import ru.netology.cloud_storage.DTO.LoginResponse;
 import ru.netology.cloud_storage.model.Token;
 import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.TokenRepository;
@@ -39,7 +42,6 @@ public class UserServiceTest {
         encoder = new BCryptPasswordEncoder();
 
 
-
         //хеширование полученого пароля
         String encoderPass = encoder.encode(pass);
 
@@ -59,7 +61,8 @@ public class UserServiceTest {
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(testUser));
 
         // запуск метода
-        String token = userService.login(login, pass);
+        LoginResponse response = userService.login(login, pass);
+        String token = response.getAuthToken();
 
         // проверка, что на null и empty
         assertEquals(true, token != null && !token.isEmpty());
@@ -71,7 +74,10 @@ public class UserServiceTest {
     @Test
     public void logoutTest() {
 
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(testToken));
+        //создает проверенного (аутентефицированого пользтователя) в SecurityContext
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(testUser, null, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // запуск метода
         boolean result = userService.logout();
@@ -80,8 +86,7 @@ public class UserServiceTest {
         assertEquals(true, result);
 
         //проверка удаления
-        verify(tokenRepository).delete(testToken);
-
+        verify(tokenRepository).deleteByUser(testUser);
     }
 }
 

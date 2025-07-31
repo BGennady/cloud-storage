@@ -25,7 +25,7 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; //свзять много (токенов) к 1му (пользователю)
+    private User user; //привязать много (токенов) к 1му (пользователю)
 
     @Column(name = "created_at")
     private LocalDateTime createdAt; //дата и время создания токена

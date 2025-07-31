@@ -22,7 +22,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     final private TokenRepository tokenRepository;
 
-    // метод для обработки запроса от пользователя
+    //метод для обработки запроса от пользователя
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

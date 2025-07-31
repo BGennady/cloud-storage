@@ -14,21 +14,21 @@ import java.util.List;
 public class FilesController {
     private final FileService fileService;
 
-    //эдпоинт для загрузки файлов
+    //эндпоинт для загрузки файлов
     @PostMapping("/file")
     public ResponseEntity<String> fileUpload(@RequestParam("file") MultipartFile file,
                                              @RequestParam("filename") String filename) {
         fileService.fileUpload(filename,file);
         return ResponseEntity.ok("Файл загружен" + filename);
     }
-    //эдпоинт для получения списка файлов
+    //эндпоинт для получения списка файлов
     @GetMapping("/list")
     public ResponseEntity<List<String>> listOfFiles(){
         List<String> list = fileService.listOfFiles();
         return ResponseEntity.ok(list);
     }
 
-    //эдпоинт для удаления файла
+    //эндпоинт для удаления файла
     @DeleteMapping("/delete")
     public ResponseEntity<String> fileDelite (@RequestParam("filename") String filename){
         fileService.fileDelete(filename);

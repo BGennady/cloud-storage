@@ -1,7 +1,6 @@
 package ru.netology.cloud_storage.controller;
 
 import lombok.AllArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ public class UserController {
     //сервис для обработки запросов
     private final UserService userService;
 
-    //эдпоинт для подачи заявки на вход
+    //эндпоинт для подачи заявки на вход
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> applyForLogin(@RequestBody LoginRequest login) {
         LoginResponse response = userService.login(login.getLogin(), login.getPassword());
@@ -25,7 +24,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    //эдпоинт для подачи заявки на выход
+    //эндпоинт для подачи заявки на выход
     @PostMapping("/logout")
     // прилетает заголовок типа: Authorization: Bearer ****
     public ResponseEntity<String> applyForLogout(Authentication auth){
