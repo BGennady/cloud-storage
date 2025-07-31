@@ -12,6 +12,6 @@ import lombok.Setter;
 
 //класс для упаковки запроса клиента-log/pass
 public class LoginRequest {
-    private String login;
+    private String email;
     private String password;
 }

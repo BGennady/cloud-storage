@@ -74,7 +74,7 @@ public class UserServiceTest {
         when(tokenRepository.findByToken(token)).thenReturn(Optional.of(testToken));
 
         // запуск метода
-        boolean result = userService.logout(token);
+        boolean result = userService.logout();
 
         // проверка результата
         assertEquals(true, result);

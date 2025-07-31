@@ -1,7 +1,6 @@
 package ru.netology.cloud_storage.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud_storage.model.Files;
@@ -19,7 +18,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class FileService {
 
-    private final TokenRepository tokenRepository;
+//    private final TokenRepository tokenRepository;
     private final FilesRepository filesRepository;
     private final UserService userService;
 

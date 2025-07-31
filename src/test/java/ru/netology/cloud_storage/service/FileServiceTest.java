@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud_storage.model.Files;
-import ru.netology.cloud_storage.model.Token;
 import ru.netology.cloud_storage.model.User;
 import ru.netology.cloud_storage.repository.FilesRepository;
-import ru.netology.cloud_storage.repository.TokenRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,28 +20,24 @@ import static org.mockito.Mockito.*;
 public class FileServiceTest {
 
     private FileService fileService; //тестируемый сервис
-    private TokenRepository tokenRepository; //мок репозитория токенов
     private FilesRepository filesRepository; //мок репозитория файлов
+    private UserService userService; //мок UserService;
+
     final private String fileName = "test_file.txt"; //имя файла
-    final private String path = "uploads/" + fileName; //его путь
-    final private String token = "a12345b";
-    final private Long userId = 101L;
+    final private String path = "D:/New/" + fileName; //его путь
 
     private User testUser;
-    private Token testToken;
-
 
     @BeforeEach
     void init() {
-        tokenRepository = mock(TokenRepository.class);
         filesRepository = mock(FilesRepository.class);
-        fileService = new FileService(tokenRepository, filesRepository);
+        userService = mock(UserService.class);
+        fileService = new FileService(filesRepository, userService);
 
-        testUser = new User();
-        testUser.setId(userId);
-        testToken = new Token();
-        testToken.setToken(token);
-        testToken.setUser(testUser);
+        testUser = new User(); //тестовый пользователь
+        testUser.setId(101L); //его ID
+
+        when(userService.getCurrentUser()).thenReturn(testUser); //при вызове UserService пепедать тестовго user;
     }
 
     @AfterEach
@@ -59,15 +53,17 @@ public class FileServiceTest {
 
         MultipartFile mockFile = mock(MultipartFile.class);
 
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(testToken));
-        when(mockFile.getSize()).thenReturn(500L);
-        doNothing().when(mockFile).transferTo(any(File.class));
+        when(mockFile.getSize()).thenReturn(500L); //передача объема файла
+        doNothing().when(mockFile).transferTo(any(File.class)); //имитация его сохранения
 
-        fileService.fileUpload(fileName, mockFile, token);
+        fileService.fileUpload(fileName, mockFile); //вызов метода
+
+        //перхватывает, то что было переданотв в Save
         ArgumentCaptor<Files> captor = ArgumentCaptor.forClass(Files.class);
         verify(filesRepository).save(captor.capture());
         Files saveFile = captor.getValue();
 
+        // сравниваем имя и размер
         assertEquals(fileName, saveFile.getFilename());
         assertEquals(500, saveFile.getSize());
     }
@@ -75,16 +71,13 @@ public class FileServiceTest {
     @Test
     public void listOfFilesTest() {
 
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(testToken));
+        // два файла для возврата списка
+        Files file1 = new Files().setFilename("test1.txt");
+        Files file2 = new Files().setFilename("test2.txt");
 
-        Files file1 = new Files();
-        file1.setFilename("test1.txt");
-        Files file2 = new Files();
-        file2.setFilename("test2.txt");
+        when(filesRepository.findAllByUser_Id(testUser.getId())).thenReturn(List.of(file1, file2));
 
-        when(filesRepository.findAllByUser_Id(userId)).thenReturn(List.of(file1, file2));
-
-        List<String> result = fileService.listOfFiles(token);
+        List<String> result = fileService.listOfFiles();
 
         assertEquals(2, result.size());
         assertEquals("test1.txt", result.get(0));
@@ -105,18 +98,17 @@ public class FileServiceTest {
             throw new RuntimeException("не удалось создать тестовый файл", e);
         }
 
-        //файл в БД (проверка удаления)
-        Files fileInDB = new Files();
-        fileInDB.setFilename(fileName);
-        fileInDB.setPath(path);
-        fileInDB.setUser(testToken.getUser());
+        // файл в БД для проверки удаления
+        Files fileInDB = new Files()
+                .setFilename(fileName)
+                .setPath(path)
+                .setUser(testUser);
 
         //моки на репозитории
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(testToken));
-        when(filesRepository.findByUser_IdAndFilename(userId, fileName)).thenReturn(Optional.of(fileInDB));
+        when(filesRepository.findByUser_IdAndFilename(testUser.getId(), fileName)).thenReturn(Optional.of(fileInDB));
 
         //метод удаления
-        fileService.fileDelete(fileName, token);
+        fileService.fileDelete(fileName);
 
         //проверка, что файл удален из БД
         verify(filesRepository).delete(fileInDB);

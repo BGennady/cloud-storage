@@ -19,7 +19,7 @@ public class UserController {
     //эдпоинт для подачи заявки на вход
     @PostMapping("/entrance")
     public ResponseEntity<String> applyForLogin(@RequestBody LoginRequest login) {
-        String token = userService.login(login.getLogin(), login.getPassword());
+        String token = userService.login(login.getEmail(), login.getPassword());
         //возврат тела с кодом 200 (ок)
         return ResponseEntity.ok(token);
     }
