@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class LoginResponse {
+    private String email;
     @JsonProperty("auth-token")
     private String authToken;
 }

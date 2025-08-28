@@ -53,7 +53,7 @@ public class UserService {
         //сохранение данных
         tokenRepository.save(token);
 
-        return new LoginResponse(generatedToken);
+        return new LoginResponse(login, generatedToken);
     }
 
     //метод для выхода
